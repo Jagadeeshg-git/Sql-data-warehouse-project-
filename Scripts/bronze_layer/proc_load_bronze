@@ -1,0 +1,156 @@
+/*
+===============================================================================
+Stored Procedure: Load Bronze Layer (Source -> Bronze)
+===============================================================================
+Script Purpose:
+    This stored procedure loads data into the 'bronze' schema from external CSV files.
+    It performs the following actions:
+    - Truncates the bronze tables before loading data.
+    - Uses the `BULK INSERT` command to load data from csv Files to bronze tables.
+
+Parameters:
+    None.
+      This stored procedure does not accept any parameters or return any values.
+
+Usage Example:
+    EXEC bronze.load_bronze;
+
+Note:
+    The BULK INSERT paths point to 'C:\sql\dwh_project\01_datasets\'.
+    Change them to the folder where you saved the datasets.
+===============================================================================
+*/
+
+CREATE OR ALTER PROCEDURE bronze.load_bronze as 
+BEGIN
+    DECLARE @START_TIME DATETIME,@END_TIME DATETIME,@btch_start_time DATETIME,@btch_end_time DATETIME
+	BEGIN TRY
+		PRINT '============================================'
+		PRINT 'LOADING THE DATA INTO BROZE LAYER           '
+		PRINT '============================================'
+		SET @btch_start_time = GETDATE()
+		PRINT 'Start time : ' + CAST(@btch_start_time AS NVARCHAR)
+		PRINT '--------------------------------------------'
+		PRINT 'LOAD CRM TABLES DATA                        '
+		PRINT '--------------------------------------------'
+
+		PRINT '>>>>TRUNCATE Table : [bronze].[crm_cust_info] '
+		TRUNCATE TABLE [bronze].[crm_cust_info];
+		SET @START_TIME = GETDATE();
+		BULK INSERT [bronze].[crm_cust_info]
+		FROM 'C:\Users\Admin\OneDrive\Desktop\sql-data-warehouse-project-main\01_datasets\source_crm\cust_info.csv'
+		with(
+		   firstrow = 2,
+		   fieldterminator=',',
+		   tablock
+		);
+		PRINT '>>>>DATA LOADED INTO : [bronze].[crm_cust_info] '
+		SET @END_TIME = GETDATE()
+		PRINT 'LOAD DURATION >> :' + CAST(DATEDIFF(second,@START_TIME,@END_TIME) AS NVARCHAR) + 'seconds'
+		PRINT '>>------------------------------------------------------------'
+
+		PRINT '>>>>TRUNCATE Table : [bronze].[crm_prd_info]'
+		TRUNCATE TABLE [bronze].[crm_prd_info];
+
+		SET @START_TIME = GETDATE()
+		BULK INSERT [bronze].[crm_prd_info]
+		FROM 'C:\Users\Admin\OneDrive\Desktop\sql-data-warehouse-project-main\01_datasets\source_crm\prd_info.csv'
+		with(
+		   firstrow = 2,
+		   fieldterminator=',',
+		   tablock
+		)
+		PRINT '>>>>DATA LOADED INTO : [bronze].[crm_prd_info] '
+		SET @END_TIME = GETDATE()
+		PRINT 'LOAD DURATION >>:' + CAST(DATEDIFF(second,@START_TIME,@END_TIME) AS NVARCHAR) + 'seconds'
+		PRINT '>>------------------------------------------------------------'
+
+		--select count(*) from [bronze].[crm_prd_info]
+		PRINT '>>>>TRUNCATE Table : [bronze].[crm_sales_details]'
+		TRUNCATE TABLE [bronze].[crm_sales_details];
+
+		SET @START_TIME = GETDATE()
+		BULK INSERT [bronze].[crm_sales_details]
+		FROM 'C:\Users\Admin\OneDrive\Desktop\sql-data-warehouse-project-main\01_datasets\source_crm\sales_details.csv'
+		with(
+		   firstrow = 2,
+		   fieldterminator=',',
+		   tablock
+		)
+		PRINT '>>>>DATA LOADED INTO : [bronze].[crm_sales_details] '
+		SET @END_TIME = GETDATE()
+		PRINT 'LOAD DURATION >> :' + CAST(DATEDIFF(second,@START_TIME,@END_TIME) AS NVARCHAR) + 'seconds'
+		PRINT '>>------------------------------------------------------------'
+
+		--select count(*) from [bronze].[crm_sales_details]
+
+		PRINT '--------------------------------------------'
+		PRINT 'LOAD ERP TABLES DATA                        '
+		PRINT '--------------------------------------------'
+
+		PRINT '>>>>TRUNCATE Table : [bronze].[erp_cust_az12] '
+		TRUNCATE TABLE [bronze].[erp_cust_az12];
+
+		SET @START_TIME = GETDATE()
+		BULK INSERT [bronze].[erp_cust_az12]
+		FROM 'C:\Users\Admin\OneDrive\Desktop\sql-data-warehouse-project-main\01_datasets\source_erp\CUST_AZ12.csv'
+		with(
+		   firstrow = 2,
+		   fieldterminator=',',
+		   tablock
+		)
+		PRINT '>>>>DATA LOADED INTO : [bronze].[erp_cust_az12]'
+		SET @END_TIME = GETDATE()
+		PRINT 'LOAD DURATION >> :' + CAST(DATEDIFF(second,@START_TIME,@END_TIME) AS NVARCHAR) + 'seconds'
+		PRINT '>>------------------------------------------------------------'
+
+
+		--select count(*) from [bronze].[erp_cust_az12]
+		PRINT '>>>>TRUNCATE Table : [bronze].[erp_loc_a101] '
+		TRUNCATE TABLE [bronze].[erp_loc_a101];
+
+		SET @START_TIME = GETDATE()
+		BULK INSERT [bronze].[erp_loc_a101]
+		FROM 'C:\Users\Admin\OneDrive\Desktop\sql-data-warehouse-project-main\01_datasets\source_erp\LOC_A101.csv'
+		with(
+		   firstrow = 2,
+		   fieldterminator=',',
+		   tablock
+		)
+		PRINT '>>>>DATA LOADED INTO : [bronze].[erp_loc_a101]'
+		SET @END_TIME = GETDATE()
+		PRINT 'LOAD DURATION >> :' + CAST(DATEDIFF(second,@START_TIME,@END_TIME) AS NVARCHAR) + 'seconds'
+		PRINT '>>------------------------------------------------------------'
+
+		--select count(*) from [bronze].[erp_loc_a101]
+
+		PRINT '>>>>TRUNCATE Table : [bronze].[erp_px_cat_g1v2]'
+		TRUNCATE TABLE [bronze].[erp_px_cat_g1v2];
+
+		SET @START_TIME = GETDATE()
+		BULK INSERT [bronze].[erp_px_cat_g1v2]
+		FROM 'C:\Users\Admin\OneDrive\Desktop\sql-data-warehouse-project-main\01_datasets\source_erp\PX_CAT_G1V2.csv'
+		with(
+		   firstrow = 2,
+		   fieldterminator=',',
+		   tablock
+		)
+		PRINT '>>>>DATA LOADED INTO : [bronze].[erp_loc_a101]'
+		SET @END_TIME = GETDATE()
+		PRINT 'LOAD DURATION >> :' + CAST(DATEDIFF(second,@START_TIME,@END_TIME) AS NVARCHAR) + 'seconds'
+		PRINT '>>------------------------------------------------------------'
+		--select count(*) from [bronze].[erp_px_cat_g1v2];
+		PRINT '>>END OF BATCH LOAD>>'
+		SET @btch_end_time = GETDATE()
+		PRINT 'end time :' + CAST(@btch_end_time AS NVARCHAR)
+		PRINT 'Batch load duration :' + CAST(DATEDIFF(second,@btch_start_time,@btch_end_time) AS NVARCHAR) + 'seconds'
+	END TRY
+	BEGIN CATCH 
+	PRINT '====================================================='
+	PRINT 'GETTING ERROR WHILE LAODING THE DATA INTO THE TABLES '
+	PRINT 'ERROR MESSAGE :' + ERROR_MESSAGE();
+	PRINT 'ERROR MESSAGE :' + CAST(ERROR_NUMBER() AS NVARCHAR);
+	PRINT 'ERROR MESSAGE :' + CAST(ERROR_STATE() AS NVARCHAR);
+	PRINT '====================================================='
+	END CATCH
+END
